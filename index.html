@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#090a09">
+    <meta name="description" content="Load local videos and switch between them instantly with the number keys.">
+    <meta property="og:title" content="Cutboard - Instant Video Switcher">
+    <meta property="og:description" content="Load local videos and switch between them instantly with the number keys.">
+    <meta property="og:image" content="og.png">
+    <title>Cutboard - Instant Video Switcher</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand" aria-label="Cutboard">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>CUTBOARD</span>
+        </div>
+        <div class="status-pill"><span class="status-dot"></span> LOCAL ONLY</div>
+        <div class="top-actions">
+          <button class="blackout-button" id="blackoutButton"><span aria-hidden="true"></span> Black screen</button>
+          <button class="add-button" id="addButton"><b aria-hidden="true">+</b> Add videos</button>
+        </div>
+        <input id="fileInput" class="file-input" type="file" accept="video/*" multiple>
+      </header>
+
+      <section id="stage" class="stage" aria-label="Video stage">
+        <div id="players" class="players"></div>
+        <div id="emptyStage" class="empty-stage">
+          <div class="empty-icon" aria-hidden="true"><span>+</span></div>
+          <h1 id="emptyTitle">Load your first set</h1>
+          <p id="emptyCopy">Select up to eight videos from this device.</p>
+          <button class="primary-button" id="chooseButton">Choose videos</button>
+        </div>
+      </section>
+
+      <section class="library" aria-label="Video slots">
+        <div class="library-heading">
+          <div><span>VIDEO SLOTS</span><strong id="videoCount">0 / 8</strong></div>
+          <div class="keyboard-hint"><kbd>0</kbd> BLACK <kbd>1-8</kbd> PLAY FULLSCREEN</div>
+        </div>
+        <div id="slots" class="slots"></div>
+      </section>
+      <button id="notice" class="notice" hidden aria-label="Dismiss message"><span id="noticeText"></span><b>×</b></button>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
