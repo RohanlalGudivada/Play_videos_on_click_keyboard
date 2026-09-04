@@ -11,6 +11,7 @@
     <title>Cutboard - Instant Video Switcher</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="camera.css">
   </head>
   <body>
     <main class="app-shell">
@@ -21,6 +22,7 @@
         </div>
         <div class="status-pill"><span class="status-dot"></span> LOCAL ONLY</div>
         <div class="top-actions">
+          <button class="camera-button" id="cameraButton"><span aria-hidden="true"></span><b id="cameraButtonText">Enable camera</b></button>
           <button class="blackout-button" id="blackoutButton"><span aria-hidden="true"></span> Black screen</button>
           <button class="add-button" id="addButton"><b aria-hidden="true">+</b> Add videos</button>
         </div>
@@ -28,6 +30,8 @@
       </header>
 
       <section id="stage" class="stage" aria-label="Video stage">
+        <video id="cameraPlayer" class="camera-player" autoplay muted playsinline aria-label="Live device camera"></video>
+        <canvas id="cameraSnapshot" class="camera-snapshot" aria-label="Last camera frame"></canvas>
         <div id="players" class="players"></div>
         <div id="emptyStage" class="empty-stage">
           <div class="empty-icon" aria-hidden="true"><span>+</span></div>
@@ -40,7 +44,7 @@
       <section class="library" aria-label="Video slots">
         <div class="library-heading">
           <div><span>VIDEO SLOTS</span><strong id="videoCount">0 / 8</strong></div>
-          <div class="keyboard-hint"><kbd>0</kbd> BLACK <kbd>1-8</kbd> PLAY FULLSCREEN</div>
+          <div class="keyboard-hint"><kbd>0</kbd> BLACK <kbd>1-8</kbd> VIDEO <kbd>9</kbd> CAMERA</div>
         </div>
         <div id="slots" class="slots"></div>
       </section>

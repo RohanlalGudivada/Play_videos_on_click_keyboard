@@ -2,7 +2,7 @@ const DB_NAME = 'cutboard-local-videos';
 const STORE_NAME = 'videos';
 const MAX_VIDEOS = 8;
 
-const state = { videos: [], activeIndex: null, blackout: false };
+const state = { videos: [], activeIndex: null, blackout: false, cameraActive: false, cameraReady: false, cameraStream: null };
 const playerElements = [];
 const stage = document.querySelector('#stage');
 const players = document.querySelector('#players');
@@ -15,6 +15,10 @@ const chooseButton = document.querySelector('#chooseButton');
 const addButton = document.querySelector('#addButton');
 const notice = document.querySelector('#notice');
 const noticeText = document.querySelector('#noticeText');
+const cameraPlayer = document.querySelector('#cameraPlayer');
+const cameraButton = document.querySelector('#cameraButton');
+const cameraButtonText = document.querySelector('#cameraButtonText');
+const cameraSnapshot = document.querySelector('#cameraSnapshot');
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -76,6 +80,9 @@ function enterBlackout() {
   stopPlayers();
   state.activeIndex = null;
   state.blackout = true;
+  state.cameraActive = false;
+  cameraPlayer.classList.remove('camera-active');
+  cameraSnapshot.classList.remove('snapshot-active');
   emptyStage.hidden = true;
   playerElements.forEach((player) => player.classList.remove('player-active'));
   requestFullscreen();
@@ -87,6 +94,12 @@ function playSlot(index) {
   const player = playerElements[index];
   if (!video || !player) return;
   requestFullscreen();
+  if (state.cameraActive && cameraPlayer.videoWidth && cameraPlayer.videoHeight) {
+    cameraSnapshot.width = cameraPlayer.videoWidth;
+    cameraSnapshot.height = cameraPlayer.videoHeight;
+    cameraSnapshot.getContext('2d')?.drawImage(cameraPlayer, 0, 0, cameraSnapshot.width, cameraSnapshot.height);
+    cameraSnapshot.classList.add('snapshot-active');
+  }
   playerElements.forEach((item, itemIndex) => {
     if (itemIndex !== index && item) {
       item.pause();
@@ -95,12 +108,55 @@ function playSlot(index) {
     }
   });
   state.blackout = false;
+  state.cameraActive = false;
   state.activeIndex = index;
   emptyStage.hidden = true;
+  cameraPlayer.classList.remove('camera-active');
   player.classList.add('player-active');
   player.currentTime = 0;
   player.play().catch(() => showNotice('Playback was blocked. Press the number key again.'));
   renderSlots();
+}
+
+async function showCamera() {
+  requestFullscreen();
+  stopPlayers();
+  state.activeIndex = null;
+  state.blackout = false;
+  emptyStage.hidden = true;
+  cameraSnapshot.classList.remove('snapshot-active');
+  playerElements.forEach((player) => player.classList.remove('player-active'));
+
+  try {
+    if (!state.cameraStream || !state.cameraStream.active) {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showNotice('Live camera is not supported by this browser.');
+        return;
+      }
+      cameraButton.disabled = true;
+      cameraButtonText.textContent = 'Starting...';
+      state.cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } },
+        audio: false,
+      });
+      cameraPlayer.srcObject = state.cameraStream;
+      state.cameraReady = true;
+      cameraButton.classList.add('ready');
+      cameraButtonText.textContent = 'Live camera';
+    }
+    state.cameraActive = true;
+    cameraPlayer.classList.add('camera-active');
+    await cameraPlayer.play();
+  } catch (error) {
+    cameraButtonText.textContent = state.cameraReady ? 'Live camera' : 'Enable camera';
+    if (error instanceof DOMException && error.name === 'NotAllowedError') {
+      showNotice('Camera permission was not allowed. Enable it in the browser and press 9 again.');
+    } else {
+      showNotice('The camera could not be started on this device.');
+    }
+  } finally {
+    cameraButton.disabled = false;
+  }
 }
 
 function createPlayer(video, index) {
@@ -218,6 +274,7 @@ fileInput.addEventListener('change', async () => {
 addButton.addEventListener('click', () => fileInput.click());
 chooseButton.addEventListener('click', () => fileInput.click());
 document.querySelector('#blackoutButton').addEventListener('click', enterBlackout);
+cameraButton.addEventListener('click', showCamera);
 notice.addEventListener('click', () => { notice.hidden = true; });
 
 window.addEventListener('keydown', (event) => {
@@ -225,6 +282,11 @@ window.addEventListener('keydown', (event) => {
   if (event.key === '0') {
     event.preventDefault();
     enterBlackout();
+    return;
+  }
+  if (event.key === '9') {
+    event.preventDefault();
+    showCamera();
     return;
   }
   const number = Number(event.key);
@@ -238,6 +300,9 @@ document.addEventListener('fullscreenchange', () => {
   if (!document.fullscreenElement) {
     stopPlayers(false);
     state.blackout = false;
+    state.cameraActive = false;
+    cameraPlayer.classList.remove('camera-active');
+    cameraSnapshot.classList.remove('snapshot-active');
     emptyStage.hidden = state.activeIndex !== null;
   }
 });
@@ -258,4 +323,7 @@ document.addEventListener('fullscreenchange', () => {
   renderSlots();
 })();
 
-window.addEventListener('beforeunload', () => state.videos.forEach((video) => URL.revokeObjectURL(video.url)));
+window.addEventListener('beforeunload', () => {
+  state.videos.forEach((video) => URL.revokeObjectURL(video.url));
+  state.cameraStream?.getTracks().forEach((track) => track.stop());
+});
