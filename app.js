@@ -19,6 +19,7 @@ const cameraPlayer = document.querySelector('#cameraPlayer');
 const cameraButton = document.querySelector('#cameraButton');
 const cameraButtonText = document.querySelector('#cameraButtonText');
 const cameraSnapshot = document.querySelector('#cameraSnapshot');
+const snapshotFrame = document.querySelector('#snapshotFrame');
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -82,7 +83,7 @@ function enterBlackout() {
   state.blackout = true;
   state.cameraActive = false;
   cameraPlayer.classList.remove('camera-active');
-  cameraSnapshot.classList.remove('snapshot-active');
+  snapshotFrame.classList.remove('snapshot-active');
   emptyStage.hidden = true;
   playerElements.forEach((player) => player.classList.remove('player-active'));
   requestFullscreen();
@@ -98,7 +99,9 @@ function playSlot(index) {
     cameraSnapshot.width = cameraPlayer.videoWidth;
     cameraSnapshot.height = cameraPlayer.videoHeight;
     cameraSnapshot.getContext('2d')?.drawImage(cameraPlayer, 0, 0, cameraSnapshot.width, cameraSnapshot.height);
-    cameraSnapshot.classList.add('snapshot-active');
+    snapshotFrame.classList.remove('snapshot-active');
+    void snapshotFrame.offsetWidth;
+    snapshotFrame.classList.add('snapshot-active');
   }
   playerElements.forEach((item, itemIndex) => {
     if (itemIndex !== index && item) {
@@ -124,7 +127,7 @@ async function showCamera() {
   state.activeIndex = null;
   state.blackout = false;
   emptyStage.hidden = true;
-  cameraSnapshot.classList.remove('snapshot-active');
+  snapshotFrame.classList.remove('snapshot-active');
   playerElements.forEach((player) => player.classList.remove('player-active'));
 
   try {
@@ -302,7 +305,7 @@ document.addEventListener('fullscreenchange', () => {
     state.blackout = false;
     state.cameraActive = false;
     cameraPlayer.classList.remove('camera-active');
-    cameraSnapshot.classList.remove('snapshot-active');
+    snapshotFrame.classList.remove('snapshot-active');
     emptyStage.hidden = state.activeIndex !== null;
   }
 });

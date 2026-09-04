@@ -31,7 +31,10 @@
 
       <section id="stage" class="stage" aria-label="Video stage">
         <video id="cameraPlayer" class="camera-player" autoplay muted playsinline aria-label="Live device camera"></video>
-        <canvas id="cameraSnapshot" class="camera-snapshot" aria-label="Last camera frame"></canvas>
+        <div id="snapshotFrame" class="snapshot-frame">
+          <canvas id="cameraSnapshot" class="camera-snapshot" aria-label="Last camera frame"></canvas>
+          <span class="scan-diamond" aria-hidden="true"></span>
+        </div>
         <div id="players" class="players"></div>
         <div id="emptyStage" class="empty-stage">
           <div class="empty-icon" aria-hidden="true"><span>+</span></div>
