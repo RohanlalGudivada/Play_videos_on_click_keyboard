@@ -164,6 +164,47 @@
   100% { top: 100%; opacity: 0; }
 }
 
+.keypad-button {
+  min-height: 38px;
+  border: 1px solid #41453e;
+  border-radius: 4px;
+  padding: 0 13px;
+  background: #171a15;
+  color: #e2e5dd;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.keypad-button span { margin-right: 6px; color: var(--lime); font: 800 13px monospace; }
+.keypad-button.active { border-color: #88aa2b; background: #22291a; color: #fff; }
+
+.scanner-standby { position: relative; z-index: 3; display: grid; place-items: center; text-align: center; color: #dff77f; }
+.standby-diamond { position: relative; width: clamp(104px, 15vw, 160px); aspect-ratio: 1; margin: 0 0 28px; border: 1px solid #8ab52b; transform: rotate(45deg); box-shadow: 0 0 20px rgb(120 175 25 / 16%), inset 0 0 22px rgb(120 175 25 / 10%); overflow: hidden; }
+.standby-diamond i { position: absolute; inset: 18%; border: 1px solid rgb(185 235 65 / 45%); }
+.standby-diamond i:nth-child(2) { inset: 35%; border-color: rgb(215 255 105 / 75%); }
+.standby-diamond span { position: absolute; left: -10%; right: -10%; top: 0; height: 1px; background: #c9ff40; box-shadow: 0 0 10px #84d800; animation: standby-scan 2.2s linear infinite; }
+.scanner-standby h1 { margin: 0; color: #e7ff91; font: 800 clamp(15px, 2vw, 21px) monospace; }
+.scanner-standby p { margin: 8px 0 17px; color: #79953b; font: 700 9px monospace; }
+.standby-readout { display: grid; grid-template-columns: auto auto; gap: 4px 18px; text-align: left; font: 700 8px monospace; }
+.standby-readout span { color: #5f7040; }
+.standby-readout b { color: #b4e941; }
+
+.control-pad { position: absolute; z-index: 8; left: 50%; bottom: 14px; transform: translateX(-50%); width: min(480px, calc(100% - 24px)); display: grid; grid-template-columns: repeat(5, minmax(44px, 1fr)); gap: 6px; padding: 8px; border: 1px solid rgb(155 198 53 / 55%); border-radius: 4px; background: rgb(8 11 7 / 90%); box-shadow: 0 8px 26px rgb(0 0 0 / 55%); touch-action: manipulation; }
+.control-pad[hidden] { display: none; }
+.control-pad button { height: 48px; border: 1px solid #3e4930; border-radius: 3px; background: #181d14; color: #e7f5c8; font: 800 15px monospace; cursor: pointer; }
+.control-pad button:active { background: var(--lime); color: #111; }
+.control-pad button:disabled { opacity: .28; cursor: default; }
+.control-pad button span { display: block; margin-top: 2px; color: #82945d; font-size: 6px; }
+.control-pad button:active span { color: #29300f; }
+
+@keyframes standby-scan {
+  0% { top: 0; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
 .snapshot-frame::after {
   background: #f3ffab;
   box-shadow: 0 0 4px 2px #f5ffbd, 0 0 14px 5px #b7ff19, 0 0 32px 10px rgb(89 255 0 / 100%);
@@ -175,10 +216,18 @@
 }
 
 @media (max-width: 700px) {
-  .topbar { height: auto; min-height: 60px; padding-top: 10px; padding-bottom: 10px; }
-  .camera-button { width: 38px; padding: 0; font-size: 0; }
-  .camera-button span { margin: 0; }
+  .topbar { height: auto; min-height: 60px; padding: 10px 12px; grid-template-columns: auto 1fr; }
+  .brand > span:last-child { display: none; }
+  .top-actions { gap: 4px; }
+  .add-button { padding: 0 9px; }
+  .keypad-button, .camera-button, .blackout-button { width: 38px; padding: 0; font-size: 0; }
+  .keypad-button span, .camera-button span, .blackout-button span { margin: 0; }
   .snapshot-frame { width: clamp(112px, 34vw, 220px); }
+  .stage { height: 62dvh; min-height: 360px; }
+  .scanner-standby { padding-bottom: 60px; }
+  .control-pad { bottom: 8px; gap: 4px; padding: 6px; }
+  .control-pad button { height: 44px; }
+  .library { padding-left: 12px; padding-right: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

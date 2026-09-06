@@ -22,6 +22,7 @@
         </div>
         <div class="status-pill"><span class="status-dot"></span> LOCAL ONLY</div>
         <div class="top-actions">
+          <button class="keypad-button" id="keypadButton" aria-pressed="false"><span aria-hidden="true">#</span> Keyboard</button>
           <button class="camera-button" id="cameraButton"><span aria-hidden="true"></span><b id="cameraButtonText">Enable camera</b></button>
           <button class="blackout-button" id="blackoutButton"><span aria-hidden="true"></span> Black screen</button>
           <button class="add-button" id="addButton"><b aria-hidden="true">+</b> Add videos</button>
@@ -36,11 +37,17 @@
           <span class="scan-diamond" aria-hidden="true"></span>
         </div>
         <div id="players" class="players"></div>
-        <div id="emptyStage" class="empty-stage">
-          <div class="empty-icon" aria-hidden="true"><span>+</span></div>
-          <h1 id="emptyTitle">Load your first set</h1>
-          <p id="emptyCopy">Select up to eight videos from this device.</p>
-          <button class="primary-button" id="chooseButton">Choose videos</button>
+        <div id="emptyStage" class="scanner-standby" aria-label="Diamond scanner standby">
+          <div class="standby-diamond" aria-hidden="true"><i></i><i></i><span></span></div>
+          <h1>DIAMOND ANALYSIS</h1>
+          <p id="standbyStatus">INITIALIZING</p>
+          <div class="standby-readout" aria-hidden="true"><span>OPTICS</span><b>READY</b><span>MODE</span><b>LOCAL</b></div>
+        </div>
+        <div id="controlPad" class="control-pad" hidden aria-label="On-screen keyboard">
+          <button data-key="0" aria-label="Black screen">0<span>BLACK</span></button>
+          <button data-key="1">1</button><button data-key="2">2</button><button data-key="3">3</button><button data-key="4">4</button>
+          <button data-key="5">5</button><button data-key="6">6</button><button data-key="7">7</button><button data-key="8">8</button>
+          <button data-key="9" aria-label="Live camera">9<span>CAM</span></button>
         </div>
       </section>
 

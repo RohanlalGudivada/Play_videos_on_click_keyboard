@@ -9,9 +9,7 @@ const players = document.querySelector('#players');
 const slots = document.querySelector('#slots');
 const fileInput = document.querySelector('#fileInput');
 const emptyStage = document.querySelector('#emptyStage');
-const emptyTitle = document.querySelector('#emptyTitle');
-const emptyCopy = document.querySelector('#emptyCopy');
-const chooseButton = document.querySelector('#chooseButton');
+const standbyStatus = document.querySelector('#standbyStatus');
 const addButton = document.querySelector('#addButton');
 const notice = document.querySelector('#notice');
 const noticeText = document.querySelector('#noticeText');
@@ -20,6 +18,8 @@ const cameraButton = document.querySelector('#cameraButton');
 const cameraButtonText = document.querySelector('#cameraButtonText');
 const cameraSnapshot = document.querySelector('#cameraSnapshot');
 const snapshotFrame = document.querySelector('#snapshotFrame');
+const keypadButton = document.querySelector('#keypadButton');
+const controlPad = document.querySelector('#controlPad');
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -66,7 +66,9 @@ function readableSize(bytes) {
 }
 
 function requestFullscreen() {
-  if (!document.fullscreenElement) stage.requestFullscreen().catch(() => undefined);
+  if (document.fullscreenElement) return;
+  const request = stage.requestFullscreen || stage.webkitRequestFullscreen;
+  if (request) Promise.resolve(request.call(stage)).catch(() => undefined);
 }
 
 function stopPlayers(reset = true) {
@@ -194,6 +196,10 @@ function renderSlots() {
   slots.replaceChildren();
   document.querySelector('#videoCount').textContent = `${state.videos.length} / ${MAX_VIDEOS}`;
   addButton.disabled = state.videos.length >= MAX_VIDEOS;
+  controlPad.querySelectorAll('button[data-key]').forEach((button) => {
+    const number = Number(button.dataset.key);
+    if (number >= 1 && number <= MAX_VIDEOS) button.disabled = !state.videos[number - 1];
+  });
 
   for (let index = 0; index < MAX_VIDEOS; index += 1) {
     const video = state.videos[index];
@@ -241,9 +247,6 @@ async function addVideos(files) {
   state.videos.push(...additions);
   renderPlayers();
   renderSlots();
-  emptyTitle.textContent = 'Choose a video slot';
-  emptyCopy.textContent = 'Your videos are ready below.';
-  chooseButton.hidden = true;
   try {
     await persistVideos();
     showNotice(`${additions.length} video${additions.length === 1 ? '' : 's'} saved on this device.`);
@@ -262,11 +265,6 @@ async function removeVideo(index) {
   renderPlayers();
   renderSlots();
   emptyStage.hidden = false;
-  if (!state.videos.length) {
-    emptyTitle.textContent = 'Load your first set';
-    emptyCopy.textContent = 'Select up to eight videos from this device.';
-    chooseButton.hidden = false;
-  }
   try { await persistVideos(); } catch { showNotice('Could not update local storage.'); }
 }
 
@@ -275,9 +273,21 @@ fileInput.addEventListener('change', async () => {
   fileInput.value = '';
 });
 addButton.addEventListener('click', () => fileInput.click());
-chooseButton.addEventListener('click', () => fileInput.click());
 document.querySelector('#blackoutButton').addEventListener('click', enterBlackout);
 cameraButton.addEventListener('click', showCamera);
+keypadButton.addEventListener('click', () => {
+  controlPad.hidden = !controlPad.hidden;
+  keypadButton.classList.toggle('active', !controlPad.hidden);
+  keypadButton.setAttribute('aria-pressed', String(!controlPad.hidden));
+});
+controlPad.addEventListener('click', (event) => {
+  const button = event.target.closest('button[data-key]');
+  if (!button || button.disabled) return;
+  const key = button.dataset.key;
+  if (key === '0') enterBlackout();
+  else if (key === '9') showCamera();
+  else playSlot(Number(key) - 1);
+});
 notice.addEventListener('click', () => { notice.hidden = true; });
 
 window.addEventListener('keydown', (event) => {
@@ -314,16 +324,12 @@ document.addEventListener('fullscreenchange', () => {
   try {
     const stored = await readStoredVideos();
     state.videos = stored.slice(0, MAX_VIDEOS).map((video) => ({ ...video, url: URL.createObjectURL(video.blob) }));
-    if (state.videos.length) {
-      emptyTitle.textContent = 'Choose a video slot';
-      emptyCopy.textContent = 'Your videos are ready below.';
-      chooseButton.hidden = true;
-    }
   } catch {
     showNotice('Local storage is unavailable. Videos will last until this tab closes.');
   }
   renderPlayers();
   renderSlots();
+  standbyStatus.textContent = 'SYSTEM READY';
 })();
 
 window.addEventListener('beforeunload', () => {
