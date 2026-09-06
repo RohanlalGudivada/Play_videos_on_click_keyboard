@@ -9,7 +9,9 @@ const players = document.querySelector('#players');
 const slots = document.querySelector('#slots');
 const fileInput = document.querySelector('#fileInput');
 const emptyStage = document.querySelector('#emptyStage');
-const standbyStatus = document.querySelector('#standbyStatus');
+const emptyTitle = document.querySelector('#emptyTitle');
+const emptyCopy = document.querySelector('#emptyCopy');
+const emptyAddButton = document.querySelector('#emptyAddButton');
 const addButton = document.querySelector('#addButton');
 const notice = document.querySelector('#notice');
 const noticeText = document.querySelector('#noticeText');
@@ -196,6 +198,9 @@ function renderSlots() {
   slots.replaceChildren();
   document.querySelector('#videoCount').textContent = `${state.videos.length} / ${MAX_VIDEOS}`;
   addButton.disabled = state.videos.length >= MAX_VIDEOS;
+  emptyTitle.textContent = state.videos.length ? 'Choose a video slot' : 'Load your first set';
+  emptyCopy.textContent = state.videos.length ? 'Your videos are ready below.' : 'Select up to eight videos from this device.';
+  emptyAddButton.hidden = state.videos.length > 0;
   controlPad.querySelectorAll('button[data-key]').forEach((button) => {
     const number = Number(button.dataset.key);
     if (number >= 1 && number <= MAX_VIDEOS) button.disabled = !state.videos[number - 1];
@@ -273,6 +278,7 @@ fileInput.addEventListener('change', async () => {
   fileInput.value = '';
 });
 addButton.addEventListener('click', () => fileInput.click());
+emptyAddButton.addEventListener('click', () => fileInput.click());
 document.querySelector('#blackoutButton').addEventListener('click', enterBlackout);
 cameraButton.addEventListener('click', showCamera);
 keypadButton.addEventListener('click', () => {
@@ -329,7 +335,6 @@ document.addEventListener('fullscreenchange', () => {
   }
   renderPlayers();
   renderSlots();
-  standbyStatus.textContent = 'SYSTEM READY';
 })();
 
 window.addEventListener('beforeunload', () => {
